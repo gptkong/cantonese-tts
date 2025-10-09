@@ -25,6 +25,53 @@ export async function segmentText(text, mode = 'default') {
 }
 
 /**
+ * 智能分句API
+ * @param {string} text - 需要分句的文本
+ * @returns {Promise<Array<{sentence: string, words: string[]}>>} - 句子数组，每个句子包含原文和分词结果
+ */
+export async function segmentBySentences(text) {
+  // 使用简单的分句规则：按句号、问号、感叹号、换行符分割
+  const sentences = text.split(/([。！？\n]+)/).filter(s => s.trim());
+
+  // 合并标点符号到前一句
+  const mergedSentences = [];
+  for (let i = 0; i < sentences.length; i++) {
+    const current = sentences[i].trim();
+    if (!current) continue;
+
+    if (/^[。！？\n]+$/.test(current)) {
+      // 如果是纯标点，附加到上一句
+      if (mergedSentences.length > 0) {
+        mergedSentences[mergedSentences.length - 1] += current;
+      }
+    } else {
+      mergedSentences.push(current);
+    }
+  }
+
+  // 对每个句子进行分词
+  const results = await Promise.all(
+    mergedSentences.map(async (sentence) => {
+      try {
+        const result = await segmentText(sentence, 'default');
+        return {
+          sentence: sentence,
+          words: result.words || []
+        };
+      } catch (error) {
+        console.error('分词失败:', error);
+        return {
+          sentence: sentence,
+          words: [sentence] // 如果分词失败，整句作为一个词
+        };
+      }
+    })
+  );
+
+  return results;
+}
+
+/**
  * 文字转语音API
  * @param {string} text - 需要转换的文本
  * @param {string} voice - 语音名称，例如 'zh-HK-HiuMaanNeural' (粤语)
