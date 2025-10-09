@@ -126,198 +126,243 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Background Pattern */}
+      <div className="fixed inset-0 opacity-20" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+
+      {/* Animated Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
+
+      <div className="relative z-10">
         {/* Header */}
-        <Card className="mb-6 shadow-lg">
-          <CardHeader className="flex flex-col items-center pb-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              粤语 TTS 分词播放器
-            </h1>
-            <p className="text-gray-500 mt-2">智能分词 · 语音播放 · 粤语学习</p>
-          </CardHeader>
-        </Card>
+        <div className="py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-3 sm:mb-4 animate-gradient">
+                粤语 TTS 分词播放器
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed px-4">
+                智能分词 · 语音播放 · 粤语学习助手
+              </p>
+              <div className="mt-4 sm:mt-6 flex flex-wrap justify-center gap-2 sm:gap-4 px-4">
+                <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500/10 border border-blue-500/30 rounded-full">
+                  <span className="text-blue-400 text-xs sm:text-sm font-medium">AI 驱动</span>
+                </div>
+                <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-500/10 border border-purple-500/30 rounded-full">
+                  <span className="text-purple-400 text-xs sm:text-sm font-medium">精准分词</span>
+                </div>
+                <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-pink-500/10 border border-pink-500/30 rounded-full">
+                  <span className="text-pink-400 text-xs sm:text-sm font-medium">真人语音</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Main Content */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Panel - Input & Controls */}
-          <div className="lg:col-span-1">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-700">输入文本</h2>
-              </CardHeader>
-              <CardBody className="gap-4">
-                {/* Voice Selector */}
-                <Select
-                  label="选择粤语语音"
-                  placeholder="请选择语音"
-                  selectedKeys={[selectedVoice]}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  isDisabled={voices.length === 0}
-                  color="primary"
-                  variant="bordered"
-                >
-                  {voices.map((voice) => (
-                    <SelectItem key={voice.ShortName} value={voice.ShortName}>
-                      {voice.Name}
-                    </SelectItem>
-                  ))}
-                </Select>
-
-                {/* Text Input */}
-                <Textarea
-                  label="中文文本"
-                  placeholder="请输入中文文本，支持多句..."
-                  value={inputText}
-                  onValueChange={setInputText}
-                  minRows={8}
-                  variant="bordered"
-                  color="primary"
-                />
-
-                {/* Segment Button */}
-                <Button
-                  color="primary"
-                  size="lg"
-                  onClick={handleSegment}
-                  isDisabled={loading || !inputText.trim()}
-                  isLoading={loading}
-                  className="w-full font-semibold"
-                >
-                  {loading ? '分词中...' : '开始分词'}
-                </Button>
-
-                {/* Error Message */}
-                {error && (
-                  <Chip color="danger" variant="flat" className="w-full p-4">
-                    {error}
-                  </Chip>
-                )}
-              </CardBody>
-            </Card>
-
-            {/* Instructions */}
-            <Card className="mt-6 shadow-lg">
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-700">使用说明</h3>
-              </CardHeader>
-              <CardBody>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary-500 font-bold">1.</span>
-                    <span>在文本框中输入中文文本（支持多句）</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary-500 font-bold">2.</span>
-                    <span>点击"开始分词"按钮进行智能分句和分词</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary-500 font-bold">3.</span>
-                    <span>点击每行开头的播放按钮，播放整句语音</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary-500 font-bold">4.</span>
-                    <span>点击分词结果中的词语，播放单个词语音</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary-500 font-bold">5.</span>
-                    <span>可以选择不同的粤语语音进行播放</span>
-                  </li>
-                </ul>
-              </CardBody>
-            </Card>
-          </div>
-
-          {/* Right Panel - Results */}
-          <div className="lg:col-span-2">
-            <Card className="shadow-lg min-h-[600px]">
-              <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-700">分词结果</h2>
-              </CardHeader>
-              <CardBody>
-                {sentences.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[500px] text-gray-400">
-                    <svg
-                      className="w-24 h-24 mb-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                      />
-                    </svg>
-                    <p className="text-lg">暂无分词结果</p>
-                    <p className="text-sm mt-2">请在左侧输入文本并点击"开始分词"</p>
+        <div className="px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid gap-6 lg:gap-8 xl:grid-cols-3">
+              {/* Left Panel - Input & Controls */}
+              <div className="xl:col-span-1 space-y-4 sm:space-y-6">
+                {/* Input Card */}
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">输入文本</h2>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {sentences.map((sentenceObj, sentenceIdx) => (
-                      <Card
-                        key={sentenceIdx}
-                        shadow="sm"
-                        className={`transition-all duration-200 ${
-                          playingSentenceIndex === sentenceIdx
-                            ? 'border-2 border-primary-500 bg-primary-50'
-                            : 'hover:shadow-md'
-                        }`}
-                      >
-                        <CardBody className="p-4">
-                          <div className="flex gap-3 items-start">
-                            {/* Play Button */}
-                            <Button
-                              isIconOnly
-                              color={playingSentenceIndex === sentenceIdx ? 'success' : 'primary'}
-                              variant={playingSentenceIndex === sentenceIdx ? 'solid' : 'flat'}
-                              size="md"
-                              onClick={() => handlePlaySentence(sentenceObj.sentence, sentenceIdx)}
-                              isDisabled={playingIndex !== null || playingSentenceIndex !== null}
-                              className="shrink-0"
-                            >
-                              {playingSentenceIndex === sentenceIdx ? (
-                                <Spinner size="sm" color="white" />
-                              ) : (
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M8 5v14l11-7z" />
-                                </svg>
-                              )}
-                            </Button>
 
-                            {/* Words Container */}
-                            <div className="flex flex-wrap gap-2 flex-1">
-                              {sentenceObj.words.map((word, wordIdx) => (
-                                <Chip
-                                  key={wordIdx}
-                                  onClick={() => handlePlayWord(word, sentenceIdx, wordIdx)}
-                                  className={`cursor-pointer transition-all duration-200 text-base px-3 py-1 ${
-                                    playingIndex?.sentenceIdx === sentenceIdx &&
-                                    playingIndex?.wordIdx === wordIdx
-                                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white scale-110 shadow-lg'
-                                      : playingSentenceIndex === sentenceIdx
-                                      ? 'bg-primary-100 text-primary-700 hover:bg-primary-200'
-                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                                  }`}
-                                  variant="flat"
-                                >
-                                  {word}
-                                </Chip>
-                              ))}
-                            </div>
-                          </div>
-                        </CardBody>
-                      </Card>
+                  <div className="space-y-4">
+                    {/* Voice Selector */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">选择粤语语音</label>
+                      <select
+                        value={selectedVoice}
+                        onChange={(e) => setSelectedVoice(e.target.value)}
+                        disabled={voices.length === 0}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200 appearance-none cursor-pointer"
+                      >
+                        {voices.length === 0 ? (
+                          <option value="">加载语音中...</option>
+                        ) : (
+                          voices.map((voice) => (
+                            <option key={voice.ShortName} value={voice.ShortName} className="bg-gray-800">
+                              {voice.Name}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Text Input */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">中文文本</label>
+                      <textarea
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        placeholder="请输入中文文本，支持多句..."
+                        rows={6}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200 resize-none"
+                      />
+                    </div>
+
+                    {/* Segment Button */}
+                    <button
+                      onClick={handleSegment}
+                      disabled={loading || !inputText.trim()}
+                      className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform ${
+                        loading || !inputText.trim()
+                          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/25'
+                      }`}
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          分词中...
+                        </div>
+                      ) : (
+                        '开始分词'
+                      )}
+                    </button>
+
+                    {/* Error Message */}
+                    {error && (
+                      <div className="p-3 sm:p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+                        <p className="text-red-400 text-sm">{error}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Instructions Card */}
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">使用说明</h3>
+                  </div>
+
+                  <div className="space-y-2 sm:space-y-3">
+                    {[
+                      '在文本框中输入中文文本（支持多句）',
+                      '点击"开始分词"按钮进行智能分句和分词',
+                      '点击每行开头的播放按钮，播放整句语音',
+                      '点击分词结果中的词语，播放单个词语音',
+                      '可以选择不同的粤语语音进行播放'
+                    ].map((instruction, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-blue-400 text-xs font-bold">{index + 1}</span>
+                        </div>
+                        <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">{instruction}</p>
+                      </div>
                     ))}
                   </div>
-                )}
-              </CardBody>
-            </Card>
+                </div>
+              </div>
+
+              {/* Right Panel - Results */}
+              <div className="xl:col-span-2">
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl min-h-[500px] lg:min-h-[600px] hover:shadow-orange-500/10 transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                    <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">分词结果</h2>
+                    {sentences.length > 0 && (
+                      <div className="ml-auto px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full">
+                        <span className="text-green-400 text-xs sm:text-sm font-medium">{sentences.length} 个句子</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-h-[400px] sm:min-h-[500px]">
+                    {sentences.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-[400px] sm:h-[500px] text-gray-400">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                          <svg className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
+                        </div>
+                        <p className="text-lg sm:text-xl font-medium text-gray-300 mb-2">暂无分词结果</p>
+                        <p className="text-sm text-gray-400 text-center px-4">请在左侧输入文本并点击"开始分词"</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 sm:space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        {sentences.map((sentenceObj, sentenceIdx) => (
+                          <div
+                            key={sentenceIdx}
+                            className={`backdrop-blur-sm rounded-xl p-3 sm:p-4 transition-all duration-300 border ${
+                              playingSentenceIndex === sentenceIdx
+                                ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-400/50 shadow-lg shadow-blue-500/20 scale-[1.02]'
+                                : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]'
+                            }`}
+                          >
+                            <div className="flex gap-3 items-start">
+                              {/* Play Button */}
+                              <button
+                                onClick={() => handlePlaySentence(sentenceObj.sentence, sentenceIdx)}
+                                disabled={playingIndex !== null || playingSentenceIndex !== null}
+                                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                                  playingSentenceIndex === sentenceIdx
+                                    ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
+                                    : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 hover:shadow-lg'
+                                } ${(playingIndex !== null || playingSentenceIndex !== null) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              >
+                                {playingSentenceIndex === sentenceIdx ? (
+                                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                )}
+                              </button>
+
+                              {/* Words Container */}
+                              <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-1">
+                                {sentenceObj.words.map((word, wordIdx) => (
+                                  <button
+                                    key={wordIdx}
+                                    onClick={() => handlePlayWord(word, sentenceIdx, wordIdx)}
+                                    disabled={playingIndex !== null || playingSentenceIndex !== null}
+                                    className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform ${
+                                      playingIndex?.sentenceIdx === sentenceIdx &&
+                                      playingIndex?.wordIdx === wordIdx
+                                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white scale-110 shadow-lg'
+                                        : playingSentenceIndex === sentenceIdx
+                                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30 hover:bg-blue-500/30'
+                                        : 'bg-white/10 text-gray-300 border border-white/20 hover:bg-white/20 hover:scale-105 hover:border-white/30'
+                                    } ${(playingIndex !== null || playingSentenceIndex !== null) && !(playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  >
+                                    {word}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
