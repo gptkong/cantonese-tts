@@ -170,7 +170,7 @@ function App() {
           <div className="max-w-7xl mx-auto">
             <div className="grid gap-6 lg:gap-8 xl:grid-cols-3">
               {/* Left Panel - Input & Controls */}
-              <div className="xl:col-span-1 space-y-4 sm:space-y-6">
+              <div className="xl:col-span-1 space-y-4">
                 {/* Input Card */}
                 <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4 sm:mb-6">
@@ -211,7 +211,7 @@ function App() {
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         placeholder="请输入中文文本，支持一句一行格式：&#10;你好，今天天气很好。&#10;我们去公园玩吧。&#10;希望每天都有好心情。"
-                        rows={6}
+                        rows={8}
                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200 resize-none"
                       />
                     </div>
@@ -254,41 +254,43 @@ function App() {
                   </div>
                 </div>
 
-                {/* Instructions Card */}
-                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {/* Compact Instructions Card */}
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-green-500/10 transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-white">使用说明</h3>
+                    <h3 className="text-sm font-semibold text-white">使用说明</h3>
                   </div>
 
-                  <div className="space-y-2 sm:space-y-3">
-                    {[
-                      '在文本框中输入中文文本（支持一句一行格式）',
-                      '系统会自动清理特殊符号、空格和无效字符',
-                      '保持一句一行的格式，便于学习和复习',
-                      '点击"开始分词"按钮进行智能分词处理',
-                      '点击每行开头的播放按钮，播放整句语音',
-                      '点击分词结果中的词语，播放单个词语音',
-                      '可以选择不同的粤语语音进行播放'
-                    ].map((instruction, index) => (
-                      <div key={index} className="flex gap-3">
-                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-blue-400 text-xs font-bold">{index + 1}</span>
-                        </div>
-                        <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">{instruction}</p>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-blue-400 text-xs font-bold">1</span>
                       </div>
-                    ))}
+                      <p className="text-gray-300 text-xs leading-relaxed">输入中文文本（支持一句一行）</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-blue-400 text-xs font-bold">2</span>
+                      </div>
+                      <p className="text-gray-300 text-xs leading-relaxed">点击"开始分词"处理文本</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-blue-400 text-xs font-bold">3</span>
+                      </div>
+                      <p className="text-gray-300 text-xs leading-relaxed">点击播放按钮听取语音</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Right Panel - Results */}
               <div className="xl:col-span-2">
-                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl min-h-[500px] lg:min-h-[600px] hover:shadow-orange-500/10 transition-all duration-300">
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6 shadow-2xl h-[600px] lg:h-[700px] hover:shadow-orange-500/10 transition-all duration-300 flex flex-col">
                   <div className="flex items-center gap-3 mb-4 sm:mb-6">
                     <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,71 +305,73 @@ function App() {
                     )}
                   </div>
 
-                  <div className="min-h-[400px] sm:min-h-[500px]">
+                  <div className="flex-1 min-h-0">
                     {sentences.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-[400px] sm:h-[500px] text-gray-400">
-                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                          <svg className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-10 h-10 sm:w-12 sm:h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                           </svg>
                         </div>
-                        <p className="text-lg sm:text-xl font-medium text-gray-300 mb-2">暂无分词结果</p>
+                        <p className="text-base sm:text-lg font-medium text-gray-300 mb-2">暂无分词结果</p>
                         <p className="text-sm text-gray-400 text-center px-4">请在左侧输入文本并点击"开始分词"</p>
                       </div>
                     ) : (
-                      <div className="space-y-3 sm:space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                        {sentences.map((sentenceObj, sentenceIdx) => (
-                          <div
-                            key={sentenceIdx}
-                            className={`backdrop-blur-sm rounded-xl p-3 sm:p-4 transition-all duration-300 border ${
-                              playingSentenceIndex === sentenceIdx
-                                ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-400/50 shadow-lg shadow-blue-500/20 scale-[1.02]'
-                                : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]'
-                            }`}
-                          >
-                            <div className="flex gap-3 items-start">
-                              {/* Play Button */}
-                              <button
-                                onClick={() => handlePlaySentence(sentenceObj.sentence, sentenceIdx)}
-                                disabled={playingIndex !== null || playingSentenceIndex !== null}
-                                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
-                                  playingSentenceIndex === sentenceIdx
-                                    ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
-                                    : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 hover:shadow-lg'
-                                } ${(playingIndex !== null || playingSentenceIndex !== null) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              >
-                                {playingSentenceIndex === sentenceIdx ? (
-                                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                ) : (
-                                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                )}
-                              </button>
+                      <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-3 sm:space-y-4">
+                          {sentences.map((sentenceObj, sentenceIdx) => (
+                            <div
+                              key={sentenceIdx}
+                              className={`backdrop-blur-sm rounded-xl p-3 sm:p-4 transition-all duration-300 border ${
+                                playingSentenceIndex === sentenceIdx
+                                  ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-400/50 shadow-lg shadow-blue-500/20 scale-[1.02]'
+                                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]'
+                              }`}
+                            >
+                              <div className="flex gap-3 items-start">
+                                {/* Play Button */}
+                                <button
+                                  onClick={() => handlePlaySentence(sentenceObj.sentence, sentenceIdx)}
+                                  disabled={playingIndex !== null || playingSentenceIndex !== null}
+                                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                                    playingSentenceIndex === sentenceIdx
+                                      ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
+                                      : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 hover:shadow-lg'
+                                  } ${(playingIndex !== null || playingSentenceIndex !== null) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                  {playingSentenceIndex === sentenceIdx ? (
+                                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                  ) : (
+                                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  )}
+                                </button>
 
-                              {/* Words Container */}
-                              <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-1">
-                                {sentenceObj.words.map((word, wordIdx) => (
-                                  <button
-                                    key={wordIdx}
-                                    onClick={() => handlePlayWord(word, sentenceIdx, wordIdx)}
-                                    disabled={playingIndex !== null || playingSentenceIndex !== null}
-                                    className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform ${
-                                      playingIndex?.sentenceIdx === sentenceIdx &&
-                                      playingIndex?.wordIdx === wordIdx
-                                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white scale-110 shadow-lg'
-                                        : playingSentenceIndex === sentenceIdx
-                                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30 hover:bg-blue-500/30'
-                                        : 'bg-white/10 text-gray-300 border border-white/20 hover:bg-white/20 hover:scale-105 hover:border-white/30'
-                                    } ${(playingIndex !== null || playingSentenceIndex !== null) && !(playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                  >
-                                    {word}
-                                  </button>
-                                ))}
+                                {/* Words Container */}
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2 flex-1">
+                                  {sentenceObj.words.map((word, wordIdx) => (
+                                    <button
+                                      key={wordIdx}
+                                      onClick={() => handlePlayWord(word, sentenceIdx, wordIdx)}
+                                      disabled={playingIndex !== null || playingSentenceIndex !== null}
+                                      className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform ${
+                                        playingIndex?.sentenceIdx === sentenceIdx &&
+                                        playingIndex?.wordIdx === wordIdx
+                                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white scale-110 shadow-lg'
+                                          : playingSentenceIndex === sentenceIdx
+                                          ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30 hover:bg-blue-500/30'
+                                          : 'bg-white/10 text-gray-300 border border-white/20 hover:bg-white/20 hover:scale-105 hover:border-white/30'
+                                      } ${(playingIndex !== null || playingSentenceIndex !== null) && !(playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                      {word}
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
