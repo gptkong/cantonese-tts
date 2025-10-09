@@ -5,7 +5,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # 复制package文件
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # 安装依赖
 RUN npm ci
