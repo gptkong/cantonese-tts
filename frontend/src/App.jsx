@@ -210,7 +210,7 @@ function App() {
                       <textarea
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
-                        placeholder="请输入中文文本，支持多句..."
+                        placeholder="请输入中文文本，支持一句一行格式：&#10;你好，今天天气很好。&#10;我们去公园玩吧。&#10;希望每天都有好心情。"
                         rows={6}
                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200 resize-none"
                       />
@@ -236,6 +236,15 @@ function App() {
                       )}
                     </button>
 
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                      <p className="text-blue-400 text-xs flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        支持一句一行格式，系统会自动清理特殊符号和空格
+                      </p>
+                    </div>
+
                     {/* Error Message */}
                     {error && (
                       <div className="p-3 sm:p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
@@ -258,8 +267,10 @@ function App() {
 
                   <div className="space-y-2 sm:space-y-3">
                     {[
-                      '在文本框中输入中文文本（支持多句）',
-                      '点击"开始分词"按钮进行智能分句和分词',
+                      '在文本框中输入中文文本（支持一句一行格式）',
+                      '系统会自动清理特殊符号、空格和无效字符',
+                      '保持一句一行的格式，便于学习和复习',
+                      '点击"开始分词"按钮进行智能分词处理',
                       '点击每行开头的播放按钮，播放整句语音',
                       '点击分词结果中的词语，播放单个词语音',
                       '可以选择不同的粤语语音进行播放'
