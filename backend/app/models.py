@@ -2,7 +2,7 @@
 Pydantic models for request validation
 """
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 
 class TTSRequest(BaseModel):
@@ -39,5 +39,30 @@ class SegmentRequest(BaseModel):
             "example": {
                 "text": "我来到北京清华大学",
                 "mode": "default"
+            }
+        }
+
+
+class CachePreloadRequest(BaseModel):
+    """
+    Request model for cache preloading
+    """
+    requests: List[TTSRequest] = Field(..., description="List of TTS requests to preload into cache")
+    ttl_hours: Optional[int] = Field(None, description="Custom time-to-live in hours for cached items")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "requests": [
+                    {
+                        "text": "你好,世界!",
+                        "voice": "zh-CN-XiaoxiaoNeural"
+                    },
+                    {
+                        "text": "欢迎使用TTS服务",
+                        "voice": "zh-HK-HiuGaaiNeural"
+                    }
+                ],
+                "ttl_hours": 48
             }
         }
