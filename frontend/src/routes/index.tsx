@@ -249,50 +249,17 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Instructions Card */}
-        <div className="mt-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-green-500/10 transition-all duration-300">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-semibold text-white">使用说明</h3>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-blue-400 text-xs font-bold">1</span>
-              </div>
-              <p className="text-gray-300 text-xs leading-relaxed">输入中文文本（支持一句一行）</p>
-            </div>
-            <div className="flex gap-2">
-              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-blue-400 text-xs font-bold">2</span>
-              </div>
-              <p className="text-gray-300 text-xs leading-relaxed">点击"开始分词"处理文本</p>
-            </div>
-            <div className="flex gap-2">
-              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-blue-400 text-xs font-bold">3</span>
-              </div>
-              <p className="text-gray-300 text-xs leading-relaxed">在结果页面点击单词或句子播放粤语语音</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Persistent Sessions Card */}
+        {/* Guess You Like Card */}
         {import.meta.env.DEV && persistentSessions.length > 0 && (
           <div className="mt-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-purple-500/10 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </div>
-                <h3 className="text-sm font-semibold text-white">持久化会话</h3>
+                <h3 className="text-sm font-semibold text-white">猜你喜欢</h3>
                 <span className="text-xs text-gray-400">({persistentSessions.length})</span>
               </div>
               <button
@@ -346,6 +313,39 @@ function HomePage() {
             </div>
           </div>
         )}
+
+        {/* Instructions Card */}
+        <div className="mt-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-green-500/10 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-white">使用说明</h3>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-blue-400 text-xs font-bold">1</span>
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">输入中文文本（支持一句一行）</p>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-blue-400 text-xs font-bold">2</span>
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">点击"开始分词"处理文本</p>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-5 h-5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-blue-400 text-xs font-bold">3</span>
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">在结果页面点击单词或句子播放粤语语音</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
