@@ -12,12 +12,25 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+      # Redis 配置（可选）
+      # 取消注释以下行以启用 Redis 持久化会话存储
+      # - REDIS_ENABLED=true
+      # - REDIS_URL=redis://redis:6379/0
+      # 会话配置
+      # - SESSION_TTL_HOURS=1
+      # - SESSION_CLEANUP_INTERVAL_SECONDS=300
+    # 或者使用 .env 文件
+    # env_file:
+    #   - ./backend/.env
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    # 如果启用 Redis，取消注释以下行
+    # depends_on:
+    #   - redis
     networks:
       - app-network
 
@@ -40,6 +53,24 @@ services:
       start_period: 40s
     networks:
       - app-network
+
+  # Redis 服务（可选）
+  # 取消注释以下部分以启用 Redis 持久化会话存储
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: tts-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   command: redis-server --appendonly yes
+  #   networks:
+  #     - app-network
+
+# 如果启用 Redis，取消注释以下行
+# volumes:
+#   redis-data:
 
 networks:
   app-network:

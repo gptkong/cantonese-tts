@@ -39,6 +39,7 @@ A production-grade, high-performance text-to-speech (TTS) backend service built 
 
 - Python 3.9 or higher
 - pip package manager
+- (Optional) Redis server for persistent session storage
 
 ### Setup
 
@@ -61,6 +62,15 @@ A production-grade, high-performance text-to-speech (TTS) backend service built 
 3. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
+   ```
+
+4. **Configure environment variables (optional)**:
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+
+   # Edit .env to configure Redis and session settings
+   # See "Environment Configuration" section below
    ```
 
 ## Running the Service
@@ -234,6 +244,52 @@ The API returns appropriate HTTP status codes:
 - **Caching**: Voice list is cached for 24 hours to avoid repeated API calls
 - **Async Operations**: All I/O operations are asynchronous for better concurrency
 
+## Environment Configuration
+
+The service supports optional environment variables for advanced configuration:
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `REDIS_ENABLED` | `false` | Enable Redis-based persistent session storage |
+| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection URL |
+| `SESSION_TTL_HOURS` | `1` | Default TTL for temporary sessions (in hours) |
+| `SESSION_CLEANUP_INTERVAL_SECONDS` | `300` | Interval for cleaning expired sessions (in seconds) |
+
+### Redis Configuration Examples
+
+#### 1. Local Redis (Development)
+```bash
+REDIS_ENABLED=true
+REDIS_URL=redis://localhost:6379/0
+```
+
+#### 2. Redis with Password
+```bash
+REDIS_ENABLED=true
+REDIS_URL=redis://:password@localhost:6379/0
+```
+
+#### 3. Redis with Username and Password
+```bash
+REDIS_ENABLED=true
+REDIS_URL=redis://username:password@localhost:6379/0
+```
+
+#### 4. Upstash Redis (Cloud)
+```bash
+REDIS_ENABLED=true
+REDIS_URL=rediss://default:your-password@your-redis.upstash.io:6379
+```
+
+### Session Storage Behavior
+
+- **Redis Disabled** (`REDIS_ENABLED=false`): All sessions stored in memory, expire after `SESSION_TTL_HOURS`
+- **Redis Enabled** (`REDIS_ENABLED=true`):
+  - Temporary sessions: Stored in memory, expire after `SESSION_TTL_HOURS`
+  - Persistent sessions: Stored in Redis, never expire (created via API with `persistent=true`)
+
 ## Development
 
 ### Running in Development Mode
@@ -245,6 +301,26 @@ uvicorn app.main:app --reload --log-level debug
 ### Testing the API
 
 Visit http://127.0.0.1:8000/docs for interactive API documentation where you can test endpoints directly in your browser.
+
+## Docker Deployment
+
+See the root directory `docker-compose.yml` for containerized deployment. Environment variables can be configured in the docker-compose file.
+
+Example with Redis:
+```yaml
+services:
+  tts-service:
+    environment:
+      - REDIS_ENABLED=true
+      - REDIS_URL=redis://redis:6379/0
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+```
+
+For detailed Docker deployment instructions, see `DEPLOYMENT.md` in the root directory.
 
 ## License
 
