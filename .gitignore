@@ -28,6 +28,10 @@ build/
 
 # TanStack Router generated files
 **/routeTree.gen.ts
+**/.tanstack/
+
+# Cache files
+backend/cache/
 
 # IDE
 .vscode/
