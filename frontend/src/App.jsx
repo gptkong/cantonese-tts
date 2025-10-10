@@ -197,7 +197,7 @@ function App() {
                         ) : (
                           voices.map((voice) => (
                             <option key={voice.ShortName} value={voice.ShortName} className="bg-gray-800">
-                              {voice.Name}
+                              {voice.DisplayName} ({voice.Gender === 'Female' ? '女声' : '男声'})
                             </option>
                           ))
                         )}
