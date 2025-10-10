@@ -567,6 +567,39 @@ async def create_session(request: SessionCreateRequest):
         )
 
 
+@app.get("/api/v1/sessions/stats")
+async def get_session_stats():
+    """
+    Get session manager statistics.
+
+    Returns:
+        JSON response with session statistics
+
+    Example:
+        ```bash
+        curl "http://127.0.0.1:8000/api/v1/sessions/stats"
+        ```
+
+        Response:
+        ```json
+        {
+            "total_sessions": 10,
+            "active_sessions": 8,
+            "expired_sessions": 2,
+            "default_ttl_hours": 1.0
+        }
+        ```
+    """
+    try:
+        stats = await session_manager.get_stats()
+        return stats
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get session stats: {str(e)}"
+        )
+
+
 @app.get("/api/v1/sessions/{session_id}", response_model=SessionResponse)
 async def get_session(session_id: str):
     """
@@ -714,38 +747,5 @@ async def delete_session(session_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete session: {str(e)}"
-        )
-
-
-@app.get("/api/v1/sessions/stats")
-async def get_session_stats():
-    """
-    Get session manager statistics.
-
-    Returns:
-        JSON response with session statistics
-
-    Example:
-        ```bash
-        curl "http://127.0.0.1:8000/api/v1/sessions/stats"
-        ```
-
-        Response:
-        ```json
-        {
-            "total_sessions": 10,
-            "active_sessions": 8,
-            "expired_sessions": 2,
-            "default_ttl_hours": 1.0
-        }
-        ```
-    """
-    try:
-        stats = await session_manager.get_stats()
-        return stats
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get session stats: {str(e)}"
         )
 
