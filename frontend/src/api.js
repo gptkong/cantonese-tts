@@ -3,6 +3,60 @@
 const API_BASE_URL = '';
 
 /**
+ * 创建新会话
+ * @param {string} text - 用户输入的文本
+ * @param {string} voice - 选择的语音
+ * @returns {Promise<{session_id: string, text: string, voice: string, ...}>}
+ */
+export async function createSession(text, voice) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text, voice }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`创建会话失败: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * 获取会话数据
+ * @param {string} sessionId - 会话ID
+ * @returns {Promise<{session_id: string, text: string, voice: string, sentences: Array, ...}>}
+ */
+export async function getSession(sessionId) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions/${sessionId}`);
+
+  if (!response.ok) {
+    throw new Error(`获取会话失败: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * 对会话文本进行分词
+ * @param {string} sessionId - 会话ID
+ * @returns {Promise<{session_id: string, sentences: Array, sentence_count: number}>}
+ */
+export async function segmentSession(sessionId) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions/${sessionId}/segment`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error(`分词失败: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * 中文分词API
  * @param {string} text - 需要分词的中文文本
  * @param {string} mode - 分词模式: 'default', 'search', 'full'

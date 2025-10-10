@@ -2,7 +2,7 @@
 Pydantic models for request validation
 """
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 class TTSRequest(BaseModel):
@@ -64,5 +64,50 @@ class CachePreloadRequest(BaseModel):
                     }
                 ],
                 "ttl_hours": 48
+            }
+        }
+
+
+class SessionCreateRequest(BaseModel):
+    """
+    Request model for creating a new session
+    """
+    text: str = Field(..., description="User input text", min_length=1)
+    voice: str = Field(..., description="Selected voice ShortName", min_length=1)
+    ttl_hours: Optional[int] = Field(None, description="Custom session time-to-live in hours (default: 1)")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Optional metadata")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "text": "你好，今天天气很好。\n我们去公园玩吧。",
+                "voice": "zh-HK-HiuMaanNeural",
+                "ttl_hours": 2
+            }
+        }
+
+
+class SessionResponse(BaseModel):
+    """
+    Response model for session operations
+    """
+    session_id: str = Field(..., description="Unique session identifier")
+    text: str = Field(..., description="Session text")
+    voice: str = Field(..., description="Session voice")
+    created_at: str = Field(..., description="Session creation timestamp (ISO format)")
+    expires_at: str = Field(..., description="Session expiration timestamp (ISO format)")
+    sentences: Optional[List[Dict[str, Any]]] = Field(None, description="Segmentation results")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Session metadata")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "text": "你好，今天天气很好。",
+                "voice": "zh-HK-HiuMaanNeural",
+                "created_at": "2025-10-10T09:30:00.000Z",
+                "expires_at": "2025-10-10T10:30:00.000Z",
+                "sentences": None,
+                "metadata": {}
             }
         }

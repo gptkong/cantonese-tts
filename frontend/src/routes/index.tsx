@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { getVoices } from '../api'
+import { getVoices, createSession } from '../api'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -32,7 +32,7 @@ function HomePage() {
     }
   }
 
-  const handleSegment = () => {
+  const handleSegment = async () => {
     if (!inputText.trim()) {
       setError('请输入中文文本')
       return
@@ -41,14 +41,22 @@ function HomePage() {
     setLoading(true)
     setError('')
 
-    // 导航到分词结果页面，传递文本和语音选择
-    navigate({
-      to: '/results',
-      search: {
-        text: inputText,
-        voice: selectedVoice,
-      },
-    })
+    try {
+      // 创建会话
+      const session = await createSession(inputText, selectedVoice)
+
+      // 导航到结果页面，只传递会话ID
+      navigate({
+        to: '/results/$sessionId',
+        params: {
+          sessionId: session.session_id,
+        },
+      })
+    } catch (err) {
+      console.error('创建会话失败:', err)
+      setError('创建会话失败，请确保TTS服务正在运行')
+      setLoading(false)
+    }
   }
 
   return (

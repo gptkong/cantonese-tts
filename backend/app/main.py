@@ -9,20 +9,37 @@ from typing import List, Dict, Any
 import edge_tts
 import jieba
 
-from app.models import TTSRequest, SegmentRequest, CachePreloadRequest
+from app.models import TTSRequest, SegmentRequest, CachePreloadRequest, SessionCreateRequest, SessionResponse
 from app.tts_generator import generate_speech_stream, pregenerate_and_cache
 from app.utils import get_available_voices, validate_voice
 from app.cache import tts_cache
+from app.session_manager import session_manager
 
 
 # Create FastAPI application instance
 app = FastAPI(
     title="TTS Service API",
-    description="High-performance text-to-speech service powered by edge-tts",
-    version="1.0.0",
+    description="High-performance text-to-speech service powered by edge-tts with session management",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    """
+    Application startup: initialize session cleanup task
+    """
+    await session_manager.start_cleanup_task()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """
+    Application shutdown: stop session cleanup task
+    """
+    await session_manager.stop_cleanup_task()
 
 
 @app.get("/")
@@ -464,5 +481,256 @@ async def clear_expired_cache():
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to clear expired cache: {str(e)}"
+        )
+
+
+# Session Management Endpoints
+
+@app.post("/api/v1/sessions", response_model=SessionResponse, status_code=status.HTTP_201_CREATED)
+async def create_session(request: SessionCreateRequest):
+    """
+    Create a new user session.
+
+    Creates a session to store user input text and voice selection, avoiding
+    the need to pass large amounts of data through URL parameters.
+
+    Args:
+        request: SessionCreateRequest containing text, voice, and optional TTL
+
+    Returns:
+        SessionResponse with session_id and session data
+
+    Example:
+        ```bash
+        curl -X POST "http://127.0.0.1:8000/api/v1/sessions" \\
+             -H "Content-Type: application/json" \\
+             -d '{
+                 "text": "你好，今天天气很好。",
+                 "voice": "zh-HK-HiuMaanNeural",
+                 "ttl_hours": 2
+             }'
+        ```
+
+        Response:
+        ```json
+        {
+            "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "text": "你好，今天天气很好。",
+            "voice": "zh-HK-HiuMaanNeural",
+            "created_at": "2025-10-10T09:30:00.000Z",
+            "expires_at": "2025-10-10T11:30:00.000Z",
+            "sentences": null,
+            "metadata": {}
+        }
+        ```
+    """
+    try:
+        # Validate voice
+        is_valid = await validate_voice(request.voice)
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid voice name: {request.voice}"
+            )
+
+        # Create session
+        session = await session_manager.create_session(
+            text=request.text,
+            voice=request.voice,
+            ttl_hours=request.ttl_hours,
+            metadata=request.metadata
+        )
+
+        return SessionResponse(**session.to_dict())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create session: {str(e)}"
+        )
+
+
+@app.get("/api/v1/sessions/{session_id}", response_model=SessionResponse)
+async def get_session(session_id: str):
+    """
+    Retrieve session data by session ID.
+
+    Args:
+        session_id: Unique session identifier
+
+    Returns:
+        SessionResponse with session data
+
+    Raises:
+        HTTPException 404: If session not found or expired
+
+    Example:
+        ```bash
+        curl "http://127.0.0.1:8000/api/v1/sessions/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ```
+    """
+    try:
+        session = await session_manager.get_session(session_id)
+
+        if session is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session not found or expired: {session_id}"
+            )
+
+        return SessionResponse(**session.to_dict())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve session: {str(e)}"
+        )
+
+
+@app.post("/api/v1/sessions/{session_id}/segment")
+async def segment_session(session_id: str):
+    """
+    Segment text for a session and store results.
+
+    Performs text segmentation on the session's text and stores the
+    results in the session for future retrieval.
+
+    Args:
+        session_id: Unique session identifier
+
+    Returns:
+        JSON response with segmentation results
+
+    Raises:
+        HTTPException 404: If session not found or expired
+
+    Example:
+        ```bash
+        curl -X POST "http://127.0.0.1:8000/api/v1/sessions/a1b2c3d4-e5f6-7890-abcd-ef1234567890/segment"
+        ```
+
+        Response:
+        ```json
+        {
+            "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "sentences": [
+                {
+                    "sentence": "你好，今天天气很好。",
+                    "words": ["你好", "今天", "天气", "很", "好"]
+                }
+            ],
+            "sentence_count": 1
+        }
+        ```
+    """
+    try:
+        # Get session
+        session = await session_manager.get_session(session_id)
+        if session is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session not found or expired: {session_id}"
+            )
+
+        # Import segmentation function
+        from app.api import segment_text_by_sentences
+
+        # Perform segmentation
+        sentences = await segment_text_by_sentences(session.text)
+
+        # Update session with results
+        await session_manager.update_session(
+            session_id=session_id,
+            sentences=sentences
+        )
+
+        return {
+            "session_id": session_id,
+            "sentences": sentences,
+            "sentence_count": len(sentences)
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to segment session text: {str(e)}"
+        )
+
+
+@app.delete("/api/v1/sessions/{session_id}")
+async def delete_session(session_id: str):
+    """
+    Delete a session.
+
+    Args:
+        session_id: Unique session identifier
+
+    Returns:
+        JSON response confirming deletion
+
+    Example:
+        ```bash
+        curl -X DELETE "http://127.0.0.1:8000/api/v1/sessions/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ```
+    """
+    try:
+        deleted = await session_manager.delete_session(session_id)
+
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session not found: {session_id}"
+            )
+
+        return {
+            "message": "Session deleted successfully",
+            "session_id": session_id
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete session: {str(e)}"
+        )
+
+
+@app.get("/api/v1/sessions/stats")
+async def get_session_stats():
+    """
+    Get session manager statistics.
+
+    Returns:
+        JSON response with session statistics
+
+    Example:
+        ```bash
+        curl "http://127.0.0.1:8000/api/v1/sessions/stats"
+        ```
+
+        Response:
+        ```json
+        {
+            "total_sessions": 10,
+            "active_sessions": 8,
+            "expired_sessions": 2,
+            "default_ttl_hours": 1.0
+        }
+        ```
+    """
+    try:
+        stats = await session_manager.get_stats()
+        return stats
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get session stats: {str(e)}"
         )
 

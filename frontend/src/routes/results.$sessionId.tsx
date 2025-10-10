@@ -1,26 +1,15 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { segmentBySentences, generateSpeech } from '../api'
+import { getSession, segmentSession, generateSpeech } from '../api'
 
-// 定义搜索参数的类型
-type ResultsSearch = {
-  text: string
-  voice: string
-}
-
-export const Route = createFileRoute('/results')({
-  validateSearch: (search: Record<string, unknown>): ResultsSearch => {
-    return {
-      text: (search.text as string) || '',
-      voice: (search.voice as string) || 'zh-HK-HiuMaanNeural',
-    }
-  },
+export const Route = createFileRoute('/results/$sessionId')({
   component: ResultsPage,
 })
 
 function ResultsPage() {
   const navigate = useNavigate()
-  const { text, voice } = Route.useSearch()
+  const { sessionId } = Route.useParams()
+  const [session, setSession] = useState(null)
   const [sentences, setSentences] = useState([])
   const [loading, setLoading] = useState(true)
   const [playingIndex, setPlayingIndex] = useState(null)
@@ -28,30 +17,43 @@ function ResultsPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!text) {
-      navigate({ to: '/' })
-      return
-    }
+    loadSessionAndSegment()
+  }, [sessionId])
 
-    handleSegment()
-  }, [text])
-
-  const handleSegment = async () => {
+  const loadSessionAndSegment = async () => {
     setLoading(true)
     setError('')
+
     try {
-      const result = await segmentBySentences(text)
-      setSentences(result)
+      // 获取会话数据
+      const sessionData = await getSession(sessionId)
+      setSession(sessionData)
+
+      // 如果会话已有分词结果，直接使用
+      if (sessionData.sentences && sessionData.sentences.length > 0) {
+        setSentences(sessionData.sentences)
+        setLoading(false)
+        return
+      }
+
+      // 否则执行分词
+      const segmentResult = await segmentSession(sessionId)
+      setSentences(segmentResult.sentences)
+
     } catch (err) {
-      console.error('分词失败:', err)
-      setError('分词失败，请确保TTS服务正在运行')
+      console.error('加载会话或分词失败:', err)
+      setError('加载失败，会话可能已过期')
+      // 3秒后返回首页
+      setTimeout(() => {
+        navigate({ to: '/' })
+      }, 3000)
     } finally {
       setLoading(false)
     }
   }
 
   const handlePlayWord = async (word, sentenceIdx, wordIdx) => {
-    if (playingIndex !== null || playingSentenceIndex !== null) {
+    if (playingIndex !== null || playingSentenceIndex !== null || !session) {
       return
     }
 
@@ -59,7 +61,7 @@ function ResultsPage() {
     setError('')
 
     try {
-      const audioBlob = await generateSpeech(word, voice)
+      const audioBlob = await generateSpeech(word, session.voice)
       const audioUrl = URL.createObjectURL(audioBlob)
       const audio = new Audio(audioUrl)
 
@@ -83,7 +85,7 @@ function ResultsPage() {
   }
 
   const handlePlaySentence = async (sentence, sentenceIdx) => {
-    if (playingIndex !== null || playingSentenceIndex !== null) {
+    if (playingIndex !== null || playingSentenceIndex !== null || !session) {
       return
     }
 
@@ -91,7 +93,7 @@ function ResultsPage() {
     setError('')
 
     try {
-      const audioBlob = await generateSpeech(sentence, voice)
+      const audioBlob = await generateSpeech(sentence, session.voice)
       const audioUrl = URL.createObjectURL(audioBlob)
       const audio = new Audio(audioUrl)
 
@@ -131,6 +133,11 @@ function ResultsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
             分词结果
           </h1>
+          {session && (
+            <div className="ml-auto text-sm text-gray-400">
+              会话: {sessionId.substring(0, 8)}...
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
