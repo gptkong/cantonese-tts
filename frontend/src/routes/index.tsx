@@ -117,30 +117,32 @@ function HomePage() {
               </select>
             </div>
 
-            {/* Persistent Session Switch */}
-            <div className="flex items-center justify-between p-4 bg-white/5 border border-white/20 rounded-xl">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  持久化会话
-                </label>
-                <p className="text-xs text-gray-400">
-                  开启后会话将永久保存到 Redis，不会过期
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsPersistent(!isPersistent)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
-                  isPersistent ? 'bg-purple-600' : 'bg-gray-600'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-                    isPersistent ? 'translate-x-6' : 'translate-x-1'
+            {/* Persistent Session Switch - Only show in development */}
+            {import.meta.env.DEV && (
+              <div className="flex items-center justify-between p-4 bg-white/5 border border-white/20 rounded-xl">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    持久化会话
+                  </label>
+                  <p className="text-xs text-gray-400">
+                    开启后会话将永久保存到 Redis，不会过期
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPersistent(!isPersistent)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+                    isPersistent ? 'bg-purple-600' : 'bg-gray-600'
                   }`}
-                />
-              </button>
-            </div>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      isPersistent ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
 
             {/* Text Input */}
             <div>
