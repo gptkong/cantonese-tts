@@ -29,17 +29,31 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     """
-    Application startup: initialize session cleanup task
+    Application startup: initialize Redis connection and session cleanup task
     """
+    # Connect to Redis if persistent store is enabled
+    if session_manager._persistent_store:
+        try:
+            await session_manager._persistent_store.connect()
+        except Exception as e:
+            import logging
+            logging.error(f"Failed to connect to Redis: {e}")
+
+    # Start session cleanup task
     await session_manager.start_cleanup_task()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """
-    Application shutdown: stop session cleanup task
+    Application shutdown: stop session cleanup task and disconnect Redis
     """
+    # Stop session cleanup task
     await session_manager.stop_cleanup_task()
+
+    # Disconnect from Redis if persistent store is enabled
+    if session_manager._persistent_store:
+        await session_manager._persistent_store.disconnect()
 
 
 @app.get("/")
@@ -538,7 +552,8 @@ async def create_session(request: SessionCreateRequest):
             text=request.text,
             voice=request.voice,
             ttl_hours=request.ttl_hours,
-            metadata=request.metadata
+            metadata=request.metadata,
+            persistent=request.persistent
         )
 
         return SessionResponse(**session.to_dict())
