@@ -6,15 +6,16 @@ const API_BASE_URL = '';
  * 创建新会话
  * @param {string} text - 用户输入的文本
  * @param {string} voice - 选择的语音
+ * @param {boolean} persistent - 是否持久化到 Redis（默认 false）
  * @returns {Promise<{session_id: string, text: string, voice: string, ...}>}
  */
-export async function createSession(text, voice) {
+export async function createSession(text, voice, persistent = false) {
   const response = await fetch(`${API_BASE_URL}/api/v1/sessions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text, voice }),
+    body: JSON.stringify({ text, voice, persistent }),
   });
 
   if (!response.ok) {
