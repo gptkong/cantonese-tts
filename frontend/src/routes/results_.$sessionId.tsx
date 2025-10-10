@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getSession, segmentSession, generateSpeech } from '../api'
 
-export const Route = createFileRoute('/results/$sessionId')({
+export const Route = createFileRoute('/results_/$sessionId')({
   component: ResultsPage,
 })
 
