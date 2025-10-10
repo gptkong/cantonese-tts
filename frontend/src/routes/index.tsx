@@ -205,7 +205,7 @@ function HomePage() {
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="请输入中文文本，支持一句一行格式：&#10;你好，今天天气很好。&#10;我们去公园玩吧。&#10;希望每天都有好心情。"
+                placeholder="如果你在这里输入你最爱的歌词呢？"
                 rows={10}
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200 resize-none"
               />
