@@ -551,6 +551,7 @@ async def create_session(request: SessionCreateRequest):
         session = await session_manager.create_session(
             text=request.text,
             voice=request.voice,
+            name=request.name,
             ttl_hours=request.ttl_hours,
             metadata=request.metadata,
             persistent=request.persistent
@@ -708,6 +709,70 @@ async def segment_session(session_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to segment session text: {str(e)}"
+        )
+
+
+@app.get("/api/v1/sessions/persistent/list")
+async def list_persistent_sessions():
+    """
+    Get all persistent sessions with their IDs and names.
+
+    Returns a list of all persistent sessions stored in Redis.
+    Persistent sessions do not expire and can be accessed across server restarts.
+
+    Returns:
+        JSON response with list of persistent sessions
+
+    Example:
+        ```bash
+        curl "http://127.0.0.1:8000/api/v1/sessions/persistent/list"
+        ```
+
+        Response:
+        ```json
+        {
+            "sessions": [
+                {
+                    "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "name": "我的第一个会话",
+                    "created_at": "2025-10-10T09:30:00.000Z"
+                }
+            ],
+            "count": 1
+        }
+        ```
+    """
+    try:
+        # Get all persistent session IDs from Redis
+        if session_manager._persistent_store:
+            session_ids = await session_manager._persistent_store.get_all_session_ids()
+
+            # Get full session data for each ID
+            sessions = []
+            for session_id in session_ids:
+                session_data = await session_manager._persistent_store.get_session(session_id)
+                if session_data:
+                    sessions.append({
+                        "session_id": session_id,
+                        "name": session_data.get("name"),
+                        "created_at": session_data.get("created_at")
+                    })
+
+            return {
+                "sessions": sessions,
+                "count": len(sessions)
+            }
+        else:
+            return {
+                "sessions": [],
+                "count": 0,
+                "message": "Persistent storage is not enabled"
+            }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get persistent sessions: {str(e)}"
         )
 
 

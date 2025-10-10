@@ -7,15 +7,16 @@ const API_BASE_URL = '';
  * @param {string} text - 用户输入的文本
  * @param {string} voice - 选择的语音
  * @param {boolean} persistent - 是否持久化到 Redis（默认 false）
- * @returns {Promise<{session_id: string, text: string, voice: string, ...}>}
+ * @param {string} name - 可选的自定义会话名称
+ * @returns {Promise<{session_id: string, text: string, voice: string, name: string, ...}>}
  */
-export async function createSession(text, voice, persistent = false) {
+export async function createSession(text, voice, persistent = false, name = null) {
   const response = await fetch(`${API_BASE_URL}/api/v1/sessions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text, voice, persistent }),
+    body: JSON.stringify({ text, voice, persistent, name }),
   });
 
   if (!response.ok) {
@@ -300,6 +301,20 @@ export async function getVoices() {
 
   if (!response.ok) {
     throw new Error(`获取语音列表失败: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * 获取所有持久化会话列表
+ * @returns {Promise<{sessions: Array<{session_id: string, name: string, created_at: string}>, count: number}>}
+ */
+export async function getPersistentSessions() {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions/persistent/list`);
+
+  if (!response.ok) {
+    throw new Error(`获取持久化会话列表失败: ${response.statusText}`);
   }
 
   return response.json();

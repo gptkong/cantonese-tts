@@ -74,6 +74,7 @@ class SessionCreateRequest(BaseModel):
     """
     text: str = Field(..., description="User input text", min_length=1)
     voice: str = Field(..., description="Selected voice ShortName", min_length=1)
+    name: Optional[str] = Field(None, description="Optional custom name for the session", max_length=100)
     ttl_hours: Optional[int] = Field(None, description="Custom session time-to-live in hours (default: 1, ignored for persistent sessions)")
     persistent: bool = Field(False, description="Whether to store session in Redis (persistent sessions never expire)")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Optional metadata")
@@ -83,6 +84,7 @@ class SessionCreateRequest(BaseModel):
             "example": {
                 "text": "你好，今天天气很好。\n我们去公园玩吧。",
                 "voice": "zh-HK-HiuMaanNeural",
+                "name": "我的第一个会话",
                 "ttl_hours": 2,
                 "persistent": False
             }
@@ -96,6 +98,7 @@ class SessionResponse(BaseModel):
     session_id: str = Field(..., description="Unique session identifier")
     text: str = Field(..., description="Session text")
     voice: str = Field(..., description="Session voice")
+    name: Optional[str] = Field(None, description="Custom session name")
     persistent: bool = Field(False, description="Whether this is a persistent session")
     created_at: str = Field(..., description="Session creation timestamp (ISO format)")
     expires_at: str = Field(..., description="Session expiration timestamp (ISO format)")
@@ -108,6 +111,7 @@ class SessionResponse(BaseModel):
                 "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "text": "你好，今天天气很好。",
                 "voice": "zh-HK-HiuMaanNeural",
+                "name": "我的第一个会话",
                 "persistent": False,
                 "created_at": "2025-10-10T09:30:00.000Z",
                 "expires_at": "2025-10-10T10:30:00.000Z",

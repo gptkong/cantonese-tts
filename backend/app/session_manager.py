@@ -22,6 +22,7 @@ class SessionData:
     session_id: str
     text: str
     voice: str
+    name: Optional[str] = None  # Optional custom name for the session
     persistent: bool = False  # Whether this is a persistent session (stored in Redis)
     created_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: datetime = field(default=None)
@@ -98,6 +99,7 @@ class SessionManager:
         self,
         text: str,
         voice: str,
+        name: Optional[str] = None,
         ttl_hours: Optional[int] = None,
         metadata: Optional[Dict[str, Any]] = None,
         persistent: bool = False
@@ -108,6 +110,7 @@ class SessionManager:
         Args:
             text: User input text
             voice: Selected voice
+            name: Optional custom name for the session
             ttl_hours: Optional custom TTL in hours (ignored for persistent sessions)
             metadata: Optional metadata dictionary
             persistent: Whether to store session in Redis (persistent sessions never expire)
@@ -125,6 +128,7 @@ class SessionManager:
             session_id=session_id,
             text=text,
             voice=voice,
+            name=name,
             persistent=persistent,
             created_at=now,
             expires_at=expires_at,

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { getVoices, createSession } from '../api'
+import { getVoices, createSession, getPersistentSessions } from '../api'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -12,11 +12,15 @@ function HomePage() {
   const [voices, setVoices] = useState([])
   const [selectedVoice, setSelectedVoice] = useState('zh-HK-HiuMaanNeural')
   const [isPersistent, setIsPersistent] = useState(false)
+  const [sessionName, setSessionName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [persistentSessions, setPersistentSessions] = useState([])
+  const [loadingSessions, setLoadingSessions] = useState(false)
 
   useEffect(() => {
     loadVoices()
+    loadPersistentSessions()
   }, [])
 
   const loadVoices = async () => {
@@ -33,6 +37,18 @@ function HomePage() {
     }
   }
 
+  const loadPersistentSessions = async () => {
+    setLoadingSessions(true)
+    try {
+      const result = await getPersistentSessions()
+      setPersistentSessions(result.sessions || [])
+    } catch (err) {
+      console.error('加载持久化会话列表失败:', err)
+    } finally {
+      setLoadingSessions(false)
+    }
+  }
+
   const handleSegment = async () => {
     if (!inputText.trim()) {
       setError('请输入中文文本')
@@ -43,8 +59,13 @@ function HomePage() {
     setError('')
 
     try {
-      // 创建会话，传递持久化参数
-      const session = await createSession(inputText, selectedVoice, isPersistent)
+      // 创建会话，传递持久化参数和名称
+      const session = await createSession(
+        inputText,
+        selectedVoice,
+        isPersistent,
+        isPersistent && sessionName.trim() ? sessionName.trim() : null
+      )
 
       // 导航到结果页面，只传递会话ID
       navigate({
@@ -58,6 +79,15 @@ function HomePage() {
       setError('创建会话失败，请确保TTS服务正在运行')
       setLoading(false)
     }
+  }
+
+  const handleSessionClick = (sessionId: string) => {
+    navigate({
+      to: '/results/$sessionId',
+      params: {
+        sessionId: sessionId,
+      },
+    })
   }
 
   return (
@@ -119,28 +149,53 @@ function HomePage() {
 
             {/* Persistent Session Switch - Only show in development */}
             {import.meta.env.DEV && (
-              <div className="flex items-center justify-between p-4 bg-white/5 border border-white/20 rounded-xl">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    持久化会话
-                  </label>
-                  <p className="text-xs text-gray-400">
-                    开启后会话将永久保存到 Redis，不会过期
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsPersistent(!isPersistent)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
-                    isPersistent ? 'bg-purple-600' : 'bg-gray-600'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-                      isPersistent ? 'translate-x-6' : 'translate-x-1'
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-4 bg-white/5 border border-white/20 rounded-xl">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      持久化会话
+                    </label>
+                    <p className="text-xs text-gray-400">
+                      开启后会话将永久保存到 Redis，不会过期
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsPersistent(!isPersistent)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+                      isPersistent ? 'bg-purple-600' : 'bg-gray-600'
                     }`}
-                  />
-                </button>
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                        isPersistent ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Session Name Input - Only show when persistent is enabled */}
+                {isPersistent && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      会话名称（可选）
+                    </label>
+                    <input
+                      type="text"
+                      value={sessionName}
+                      onChange={(e) => setSessionName(e.target.value)}
+                      placeholder="为此会话取个名字，方便日后查找..."
+                      maxLength={100}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-200"
+                    />
+                    <p className="mt-1.5 text-xs text-gray-400 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      留空则使用会话ID作为标识
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -226,6 +281,71 @@ function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Persistent Sessions Card */}
+        {import.meta.env.DEV && persistentSessions.length > 0 && (
+          <div className="mt-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-purple-500/10 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-white">持久化会话</h3>
+                <span className="text-xs text-gray-400">({persistentSessions.length})</span>
+              </div>
+              <button
+                onClick={loadPersistentSessions}
+                disabled={loadingSessions}
+                className="text-xs text-purple-400 hover:text-purple-300 transition-colors duration-200 flex items-center gap-1"
+              >
+                <svg className={`w-3 h-3 ${loadingSessions ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                刷新
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {persistentSessions.map((session, index) => (
+                <button
+                  key={session.session_id}
+                  onClick={() => handleSessionClick(session.session_id)}
+                  className="w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-purple-500/50 rounded-lg transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className="text-purple-400 text-xs font-medium flex-shrink-0">#{index + 1}</span>
+                      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                        {session.name ? (
+                          <>
+                            <span className="text-gray-200 text-sm font-medium truncate">{session.name}</span>
+                            <span className="text-gray-400 text-xs font-mono truncate">{session.session_id}</span>
+                          </>
+                        ) : (
+                          <span className="text-gray-300 text-xs font-mono truncate">{session.session_id}</span>
+                        )}
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-gray-400 group-hover:text-purple-400 transition-colors duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-3 p-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+              <p className="text-purple-400 text-xs flex items-center gap-2">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                点击会话可快速访问历史分词结果
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
