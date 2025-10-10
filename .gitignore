@@ -26,6 +26,9 @@ dist/
 build/
 .vite/
 
+# TanStack Router generated files
+**/routeTree.gen.ts
+
 # IDE
 .vscode/
 .idea/
