@@ -250,7 +250,7 @@ function HomePage() {
         </div>
 
         {/* Guess You Like Card */}
-        {import.meta.env.DEV && persistentSessions.length > 0 && (
+        {persistentSessions.length > 0 && (
           <div className="mt-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-xl hover:shadow-purple-500/10 transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
