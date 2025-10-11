@@ -15,6 +15,12 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
+      },
+      '/bing-wallpaper': {
+        target: 'https://www.bing.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/bing-wallpaper/, ''),
+        secure: false,
       }
     }
   }
