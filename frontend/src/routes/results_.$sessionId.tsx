@@ -179,53 +179,79 @@ function ResultsPage() {
               <p className="text-sm text-gray-400">请返回首页输入文本</p>
             </div>
           ) : (
-            <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
               {sentences.map((sentenceObj, sentenceIdx) => (
                 <div
                   key={sentenceIdx}
-                  className={`backdrop-blur-sm rounded-xl p-4 transition-all duration-300 border ${
+                  className={`group relative backdrop-blur-sm rounded-2xl p-5 transition-all duration-500 border ${
                     playingSentenceIndex === sentenceIdx
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-400/50 shadow-lg shadow-blue-500/20 scale-[1.02]'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]'
+                      ? 'bg-gradient-to-br from-blue-500/25 via-purple-500/20 to-pink-500/15 border-blue-400/60 shadow-2xl shadow-blue-500/30 scale-[1.03]'
+                      : 'bg-white/5 border-white/10'
                   }`}
                 >
-                  <div className="flex gap-3 items-start">
-                    {/* Play Button */}
+                  {/* 角落装饰边框 */}
+                  {playingSentenceIndex === sentenceIdx && (
+                    <>
+                      <span className="absolute w-4 h-4 border-[3px] rounded-[4px] -top-2 -left-2 border-r-0 border-b-0 border-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)] transition-all duration-300"></span>
+                      <span className="absolute w-4 h-4 border-[3px] rounded-[4px] -top-2 -right-2 border-l-0 border-b-0 border-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.6)] transition-all duration-300"></span>
+                      <span className="absolute w-4 h-4 border-[3px] rounded-[4px] -bottom-2 -left-2 border-r-0 border-t-0 border-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.6)] transition-all duration-300"></span>
+                      <span className="absolute w-4 h-4 border-[3px] rounded-[4px] -bottom-2 -right-2 border-l-0 border-t-0 border-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)] transition-all duration-300"></span>
+                    </>
+                  )}
+
+                  <div className="flex gap-4 items-center">
+                    {/* Play Button - 增强版 */}
                     <button
                       onClick={() => handlePlaySentence(sentenceObj.sentence, sentenceIdx)}
                       disabled={playingIndex !== null || playingSentenceIndex !== null}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                      className={`relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
                         playingSentenceIndex === sentenceIdx
-                          ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
-                          : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 hover:shadow-lg'
-                      } ${(playingIndex !== null || playingSentenceIndex !== null) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          ? 'bg-gradient-to-br from-green-400 via-teal-500 to-cyan-500 text-white shadow-2xl shadow-teal-500/50 scale-105'
+                          : 'bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white'
+                      } ${(playingIndex !== null || playingSentenceIndex !== null) ? 'opacity-40 cursor-not-allowed' : ''}`}
                     >
+
                       {playingSentenceIndex === sentenceIdx ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <div className="relative">
+                          <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <div className="absolute inset-0 w-5 h-5 border-3 border-white/10 rounded-full animate-ping"></div>
+                        </div>
                       ) : (
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 relative z-10" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       )}
                     </button>
 
-                    {/* Words Container */}
-                    <div className="flex flex-wrap gap-2 flex-1">
+                    {/* Words Container - 增强交互 */}
+                    <div className="flex flex-wrap gap-2.5 flex-1">
                       {sentenceObj.words.map((word, wordIdx) => (
                         <button
                           key={wordIdx}
                           onClick={() => handlePlayWord(word, sentenceIdx, wordIdx)}
                           disabled={playingIndex !== null || playingSentenceIndex !== null}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 transform ${
+                          className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 transform overflow-hidden ${
                             playingIndex?.sentenceIdx === sentenceIdx &&
                             playingIndex?.wordIdx === wordIdx
-                              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white scale-110 shadow-lg'
+                              ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white scale-110 shadow-2xl shadow-purple-500/50 z-10'
                               : playingSentenceIndex === sentenceIdx
-                              ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30 hover:bg-blue-500/30'
-                              : 'bg-white/10 text-gray-300 border border-white/20 hover:bg-white/20 hover:scale-105 hover:border-white/30'
-                          } ${(playingIndex !== null || playingSentenceIndex !== null) && !(playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              ? 'bg-blue-500/25 text-blue-200 border border-blue-400/40'
+                              : 'bg-white/10 text-gray-200 border border-white/20'
+                          } ${(playingIndex !== null || playingSentenceIndex !== null) && !(playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                          style={{
+                            filter: playingSentenceIndex === sentenceIdx && playingIndex?.sentenceIdx !== sentenceIdx
+                              ? 'blur(0px)'
+                              : playingSentenceIndex !== null && playingSentenceIndex !== sentenceIdx
+                              ? 'blur(2px)'
+                              : 'blur(0px)',
+                          }}
                         >
-                          {word}
+                          {/* 按钮背景光效 */}
+                          {playingIndex?.sentenceIdx === sentenceIdx && playingIndex?.wordIdx === wordIdx && (
+                            <span className="absolute inset-0 bg-gradient-to-r from-blue-400/50 via-purple-400/50 to-pink-400/50 animate-pulse"></span>
+                          )}
+
+                          <span className="relative z-10">{word}</span>
                         </button>
                       ))}
                     </div>
