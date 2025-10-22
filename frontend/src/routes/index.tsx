@@ -27,7 +27,7 @@ function HomePage() {
 
   const loadBingWallpaper = async () => {
     try {
-      // 使用 Vite 代理访问 Bing 每日壁纸 API
+      // 使用 Nginx 代理访问 Bing 每日壁纸 API
       const response = await fetch('/bing-wallpaper/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN')
       const data = await response.json()
       if (data.images && data.images.length > 0) {
