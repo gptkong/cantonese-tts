@@ -2,8 +2,9 @@
 
 ## 变更记录 (Changelog)
 
-- **2025-10-22**: 初始化 AI 上下文文档，生成根级和模块级文档
-- 项目为现代化粤语 TTS 应用，支持智能分词和交互式语音播放
+- **2025-10-22 11:02**: 增量更新完成，深度分析核心组件，覆盖率达 75.3%
+- **2025-10-22 10:39**: 初始化 AI 上下文文档，生成根级和模块级文档，覆盖率 50.6%
+- **架构深挖**: 详细分析结果页面交互、Redis持久化机制、高级缓存策略、会话管理核心逻辑
 
 ## 项目愿景
 
@@ -14,17 +15,17 @@
 项目采用前后端分离的现代化架构：
 
 ### 技术栈
-- **后端**: Python 3.11 + FastAPI + edge-tts + jieba 分词
-- **前端**: React 18 + Vite 7 + TanStack Router + TailwindCSS
+- **后端**: Python 3.11 + FastAPI + edge-tts + jieba 分词 + Redis
+- **前端**: React 19 + Vite 7 + TanStack Router + TailwindCSS + HeroUI
 - **部署**: Docker + Docker Compose + Nginx 反向代理
 
 ### 核心特性
 - 智能中文分词（基于 jieba）
 - 粤语语音合成（Microsoft Edge TTS）
 - 交互式单词级播放
-- 会话管理系统
-- 高性能缓存机制
-- 持久化存储（Redis）
+- 三重缓存系统（内存+文件+Redis）
+- 会话管理（临时+持久化）
+- 异步高并发处理
 - 响应式现代化 UI
 
 ## 模块结构图
@@ -35,18 +36,20 @@ graph TD
     A --> C["frontend"];
     A --> D["docker-compose.yml"];
 
-    B --> B1["app/main.py"];
-    B --> B2["tts_generator.py"];
-    B --> B3["models.py"];
-    B --> B4["cache.py"];
-    B --> B5["session_manager.py"];
-    B --> B6["utils.py"];
+    B --> B1["main.py<br/>API 路由注册"];
+    B --> B2["tts_generator.py<br/>语音合成引擎"];
+    B --> B3["models.py<br/>数据模型定义"];
+    B --> B4["cache.py<br/>三重缓存系统"];
+    B --> B5["session_manager.py<br/>会话管理核心"];
+    B --> B6["persistent_store.py<br/>Redis持久化"];
+    B --> B7["config.py<br/>配置管理"];
+    B --> B8["utils.py<br/>工具函数"];
 
-    C --> C1["src/main.tsx"];
-    C --> C2["src/api.js"];
-    C --> C3["routes/__root.tsx"];
-    C --> C4["routes/index.tsx"];
-    C --> C5["routes/results_.$sessionId.tsx"];
+    C --> C1["main.tsx<br/>应用入口"];
+    C --> C2["api.js<br/>API服务层"];
+    C --> C3["routes/__root.tsx<br/>根布局组件"];
+    C --> C4["routes/index.tsx<br/>首页交互"];
+    C --> C5["routes/results_.$sessionId.tsx<br/>结果页面"];
 
     click B "./backend/CLAUDE.md" "查看后端模块文档"
     click C "./frontend/CLAUDE.md" "查看前端模块文档"
@@ -56,24 +59,24 @@ graph TD
 
 | 模块 | 路径 | 类型 | 职责 | 关键文件 |
 |------|------|------|------|----------|
-| **backend** | `backend/` | Python FastAPI 服务 | TTS语音合成、文本分词、会话管理、缓存 | `main.py`, `tts_generator.py`, `models.py` |
+| **backend** | `backend/` | Python FastAPI 服务 | TTS语音合成、文本分词、会话管理、缓存 | `main.py`, `tts_generator.py`, `cache.py`, `session_manager.py` |
 | **frontend** | `frontend/` | React 应用 | 用户界面、路由管理、API集成 | `main.tsx`, `api.js`, `routes/` |
 
 ### 模块详细职责
 
 #### Backend (backend/)
-- **TTS生成**: 基于 edge-tts 的粤语语音合成
-- **智能分词**: 使用 jieba 进行中文文本分析
-- **会话管理**: 支持临时和持久化会话存储
-- **缓存系统**: 文件级音频缓存，支持TTL管理
-- **API接口**: RESTful API，支持流式音频响应
+- **TTS生成**: 基于 edge-tts 的异步语音合成，支持流式传输
+- **智能分词**: 使用 jieba 进行中文文本分析，支持句子级和词汇级分词
+- **三重缓存系统**: 内存缓存+文件缓存+Redis持久化的分层缓存策略
+- **会话管理**: 支持临时会话和持久化会话的双重管理模式
+- **API接口**: RESTful API，支持异步处理和流式响应
 
 #### Frontend (frontend/)
-- **路由管理**: 基于 TanStack Router 的文件路由系统
-- **用户界面**: 现代化响应式设计，支持深色主题
-- **API集成**: 与后端服务的异步通信
-- **交互体验**: 点击式单词播放，流畅的动画效果
+- **路由管理**: 基于 TanStack Router 的文件路由系统，支持类型安全
+- **用户界面**: 现代化响应式设计，支持深色主题和玻璃效果
+- **交互体验**: 点击式单词播放，流畅的动画效果和状态管理
 - **会话历史**: 支持持久化会话的访问和管理
+- **Bing壁纸**: 动态壁纸集成，提升用户体验
 
 ## 运行与开发
 
@@ -100,6 +103,7 @@ cd frontend && npm run dev
 - `GET /api/v1/voices` - 获取可用语音列表
 - `POST /api/v1/sessions` - 创建会话
 - `GET /api/v1/sessions/{id}` - 获取会话数据
+- `GET /api/v1/cache/stats` - 缓存统计信息
 
 ## 测试策略
 
@@ -136,27 +140,37 @@ cd frontend && npm run dev
 1. **API开发**: 优先查看 `backend/app/main.py` 了解现有端点
 2. **前端组件**: 参考 `frontend/src/routes/index.tsx` 的组件结构
 3. **数据模型**: 检查 `backend/app/models.py` 的请求/响应格式
-4. **样式系统**: 使用 TailwindCSS 类，遵循现有的设计系统
+4. **缓存策略**: 查看 `backend/app/cache.py` 的三层缓存实现
+5. **会话管理**: 参考 `backend/app/session_manager.py` 的会话逻辑
 
 ### 常见开发场景
 - **添加新的API端点**: 在 `main.py` 中注册路由，更新 `models.py`
 - **新增前端页面**: 在 `frontend/src/routes/` 创建新组件
 - **修改TTS参数**: 检查 `tts_generator.py` 中的 edge-tts 配置
 - **缓存策略调整**: 修改 `cache.py` 中的缓存逻辑
+- **会话持久化**: 配置 Redis 连接和环境变量
 
 ## 性能优化
 
 ### 已实现的优化
-- **音频缓存**: 文件级缓存，支持TTL和LRU清理
-- **会话管理**: Redis 持久化，减少重复分词计算
-- **流式响应**: 音频数据流式传输，减少内存占用
-- **前端构建**: Vite 快速构建和热重载
+- **三重缓存**: 内存缓存+文件缓存+Redis持久化的分层架构
+- **LRU策略**: 智能缓存淘汰，基于访问时间和频率
+- **异步处理**: 全异步架构，支持高并发请求
+- **流式传输**: 音频数据流式传输，减少内存占用
+- **智能分词**: 基于句子的智能分词算法，提高准确性
+
+### 架构亮点
+- **会话管理**: 临时会话和持久化会话的双重模式
+- **错误处理**: 完善的异常处理和用户反馈机制
+- **资源管理**: 自动清理过期缓存和会话
+- **监控统计**: 实时的缓存命中率和性能指标
 
 ### 可进一步优化的方向
 - 音频压缩和格式优化
 - CDN 静态资源分发
 - 数据库查询优化
 - 前端代码分割和懒加载
+- 负载均衡和水平扩展
 
 ## 部署说明
 
@@ -171,6 +185,27 @@ cd frontend && npm run dev
 - 负载均衡配置
 - 监控和日志收集
 - 自动扩缩容策略
+
+## 关键技术洞察
+
+### 缓存系统架构
+```python
+# 三层缓存设计
+1. 内存缓存: _voices_cache (语音列表，24小时TTL)
+2. 文件缓存: TTSCache (音频文件，SHA256哈希索引)
+3. Redis缓存: PersistentSessionStore (会话持久化)
+```
+
+### 会话管理策略
+- **临时会话**: 内存存储，默认1小时TTL，自动清理
+- **持久化会话**: Redis存储，跨重启保持，支持命名
+- **自动清理**: 后台任务定期清理过期会话
+
+### 前端交互模式
+- **状态管理**: React Hooks + 异步状态更新
+- **错误处理**: 统一的异常捕获和用户反馈
+- **视觉反馈**: 加载状态、播放状态、错误提示
+- **响应式设计**: 移动端适配和触摸交互
 
 ---
 
