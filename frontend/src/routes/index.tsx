@@ -117,30 +117,20 @@ function HomePage() {
       {/* 遮罩层 */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
-      {/* 内容 */}
-      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
-          {/* 标题卡片 */}
-          <div className="text-center mb-8 backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl">
-            <h1 className="text-5xl sm:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+      {/* 顶部导航栏 */}
+      <div className="relative z-10 backdrop-blur-xl bg-white/10 border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-16">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">
               粤语 TTS 分词播放器
             </h1>
-            <p className="text-lg text-gray-200 mb-6">
-              智能分词 · 语音播放 · 粤语学习
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <span className="px-4 py-2 bg-blue-500/20 border border-blue-400/40 rounded-full text-blue-200 text-sm">
-                AI 驱动
-              </span>
-              <span className="px-4 py-2 bg-purple-500/20 border border-purple-400/40 rounded-full text-purple-200 text-sm">
-                精准分词
-              </span>
-              <span className="px-4 py-2 bg-pink-500/20 border border-pink-400/40 rounded-full text-pink-200 text-sm">
-                真人语音
-              </span>
-            </div>
           </div>
+        </div>
+      </div>
 
+      {/* 内容 */}
+      <div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
           {/* 主输入卡片 */}
           <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl mb-6">
             <div className="space-y-6">
@@ -241,11 +231,11 @@ function HomePage() {
             </div>
           </div>
 
-          {/* 历史会话卡片 */}
+          {/* 猜你喜欢卡片 */}
           {persistentSessions.length > 0 && (
             <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">历史会话</h3>
+                <h3 className="text-lg font-semibold text-white">猜你喜欢</h3>
                 <button
                   onClick={loadPersistentSessions}
                   disabled={loadingSessions}

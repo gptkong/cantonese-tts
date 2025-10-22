@@ -263,7 +263,7 @@ bg-white/10 border border-white/30 rounded-xl text-white placeholder-gray-300 fo
 
 ### 会话管理
 - **持久化选项**: 开发环境支持 Redis 持久化
-- **历史记录**: 显示和管理历史会话
+- **历史记录**: 显示和管理猜你喜欢
 - **快速访问**: 一键访问之前的会话结果
 - **会话命名**: 自定义会话名称便于管理
 
