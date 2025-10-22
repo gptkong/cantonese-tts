@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getVoices, createSession, getPersistentSessions } from '../api'
+import { useWallpaper } from '../contexts/WallpaperContext'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -8,6 +9,7 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   const navigate = useNavigate()
+  const { bingWallpaper } = useWallpaper()
   const [inputText, setInputText] = useState('')
   const [voices, setVoices] = useState([])
   const [selectedVoice, setSelectedVoice] = useState('zh-HK-HiuMaanNeural')
@@ -17,28 +19,11 @@ function HomePage() {
   const [loading, setLoading] = useState(false)
   const [persistentSessions, setPersistentSessions] = useState([])
   const [loadingSessions, setLoadingSessions] = useState(false)
-  const [bingWallpaper, setBingWallpaper] = useState('')
 
   useEffect(() => {
     loadVoices()
     loadPersistentSessions()
-    loadBingWallpaper()
   }, [])
-
-  const loadBingWallpaper = async () => {
-    try {
-      // 使用 Nginx 代理访问 Bing 每日壁纸 API
-      const response = await fetch('/bing-wallpaper/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN')
-      const data = await response.json()
-      if (data.images && data.images.length > 0) {
-        // 使用代理路径访问图片
-        const imageUrl = `/bing-wallpaper${data.images[0].url}`
-        setBingWallpaper(imageUrl)
-      }
-    } catch (err) {
-      console.error('加载 Bing 壁纸失败:', err)
-    }
-  }
 
   const loadVoices = async () => {
     try {

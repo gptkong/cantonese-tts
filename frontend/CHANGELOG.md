@@ -5,6 +5,31 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.0] - 2025-10-22
+
+### 新增
+- Bing每日壁纸背景功能
+- 全局壁纸状态管理系统
+- 壁纸在首页和结果页面之间的共享
+- Nginx代理配置支持生产环境壁纸请求
+
+### 优化
+- 避免重复请求壁纸API，提升性能
+- 统一的背景视觉体验
+- 防止重复加载的逻辑
+
+### 修复
+- Docker部署环境中壁纸加载失败的问题
+- 生产环境中Nginx代理配置缺失
+
+### 技术实现
+- React Context API实现全局状态管理
+- WallpaperProvider组件包装应用根组件
+- useWallpaper Hook提供状态访问接口
+- Nginx反向代理配置支持Bing API
+
+---
+
 ## [1.0.0] - 2025-10-08
 
 ### 新增

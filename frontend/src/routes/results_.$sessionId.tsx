@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getSession, segmentSession, generateSpeech } from '../api'
+import { useWallpaper } from '../contexts/WallpaperContext'
 
 export const Route = createFileRoute('/results_/$sessionId')({
   component: ResultsPage,
@@ -9,6 +10,7 @@ export const Route = createFileRoute('/results_/$sessionId')({
 function ResultsPage() {
   const navigate = useNavigate()
   const { sessionId } = Route.useParams()
+  const { bingWallpaper } = useWallpaper()
   const [session, setSession] = useState(null)
   const [sentences, setSentences] = useState([])
   const [loading, setLoading] = useState(true)
@@ -117,8 +119,18 @@ function ResultsPage() {
   }
 
   return (
-    <div className="py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed relative"
+      style={{
+        backgroundImage: bingWallpaper ? `url(${bingWallpaper})` : 'linear-gradient(to bottom right, #1a1a2e, #16213e)'
+      }}
+    >
+      {/* 遮罩层 */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+      {/* 内容 */}
+      <div className="relative z-10 py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header with Back Button */}
         <div className="mb-6 flex items-center gap-4">
           <Link
@@ -260,6 +272,7 @@ function ResultsPage() {
               ))}
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
